@@ -1,25 +1,25 @@
-﻿using DL.DAL.Providers;
-using DL.DAL.DBHelpers;
+﻿using DL.DAL.DBHelpers;
+using DL.DAL.Providers;
 
 namespace DL.DAL
 {
-    public class DBOps
+    public class DBOps 
     {
-        private IDBProvider _db;
+        private readonly IDBProvider _db;
 
         public DBOps(IDBProvider dbProvider)
         {
             _db = dbProvider;
         }
 
-        private CustomersLoan _customersLoan;
+        private Customers _customersLoan;
 
-        public virtual CustomersLoan CustomersLoan
+        public virtual Customers CustomersLoan
         {
             get
             {
                 if (_customersLoan == null)
-                    _customersLoan = new CustomersLoan(_db);
+                    _customersLoan = new Customers(_db);
                 return _customersLoan;
             }
         }

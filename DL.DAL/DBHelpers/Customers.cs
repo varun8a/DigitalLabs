@@ -1,33 +1,29 @@
-﻿using Azure;
-using Dapper;
+﻿using Dapper;
 using DL.DAL.Providers;
 using DL.Shared.Models;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Text;
 
 namespace DL.DAL.DBHelpers
 {
-    
-    public class CustomersLoan //:DALBase
+
+    public class Customers
     {
 
-        private IDBProvider _db;
-        public CustomersLoan()
-        {
+        private readonly IDBProvider _db;
 
-        }
-        public CustomersLoan(IDBProvider dbProvider)// : base(dbProvider)
+        public Customers(IDBProvider dbProvider)// : base(dbProvider)
         {
             _db = dbProvider;
         }
-
+        /// <summary>
+        /// AddCustomersLoan
+        /// </summary>
+        /// <param name="customersLoan"></param>
+        /// <returns></returns>
         public virtual async Task<string> AddCustomersLoan(Customer customersLoan)
         {
             var parameters = new DynamicParameters();
             var spresult = string.Empty;
-            string storedProcedure = string.Empty;
             parameters.Add("@CustomerSSN", customersLoan.CustomerSSN);
             parameters.Add("@FullName", customersLoan.FullName);
             parameters.Add("@LoanAmount", customersLoan.LoanAmount);
@@ -35,9 +31,7 @@ namespace DL.DAL.DBHelpers
             parameters.Add("@SalaryAmount", customersLoan.SalaryAmount);
             parameters.Add("@spresult", dbType: DbType.String, direction: ParameterDirection.Output, size: 4000);
 
-            storedProcedure = "AddCustomersLoan";
-            //await RunWithRetyAsync(async (conn) =>
-            //{
+            string storedProcedure = "AddCustomersLoan";
             using (var conn = _db.Connection)
             {
                 conn.Open();
@@ -48,34 +42,25 @@ namespace DL.DAL.DBHelpers
                 spresult = parameters.Get<string>("@spresult");
             }
 
-            //});
-
             return spresult;
         }
 
+        /// <summary>
+        /// GetAllCustomers records for Loan
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task<IEnumerable<Customer>> GetAllCustomersLoan()
         {
-            var parameters = new DynamicParameters();
-            var spresult = string.Empty;
-            string storedProcedure = string.Empty;
-
-            storedProcedure = "GetAllCustomersLoan";
-
-            //return await RunWithRetyAsync(async (conn) =>
-            //  {
-            //  {
+            string storedProcedure = "GetAllCustomersLoan";
             using (var conn = _db.Connection)
             {
                 conn.Open();
 
                 var response = await conn.QueryAsync<Customer>(storedProcedure,
-                       parameters,
+                       new DynamicParameters(),
                        commandType: CommandType.StoredProcedure);
                 return response ?? new List<Customer>();
             }
-            //});
-
         }
-
     }
 }

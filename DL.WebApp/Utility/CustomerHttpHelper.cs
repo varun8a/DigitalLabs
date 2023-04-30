@@ -4,12 +4,21 @@ using System;
 using Newtonsoft.Json;
 using DL.Shared.Models;
 using DL.Shared.Helpers;
+using DL.WebApp.Models;
+using Microsoft.Extensions.Options;
 
 namespace DL.WebApp.Utility
 {
-    public static class CustomerHttpHelper
+    public class CustomerHttpHelper
     {
-        public static async Task<IEnumerable<Customer>> GetAllCustomer()
+        private readonly IOptionsSnapshot<AppConfig> _config;
+
+        public CustomerHttpHelper(IOptionsSnapshot<AppConfig> config)
+        {
+            _config = config;
+        }
+
+        public async Task<IEnumerable<Customer>> GetAllCustomer()
         {
             string datafromApi = string.Empty;
             IEnumerable<Customer> response;
@@ -18,8 +27,8 @@ namespace DL.WebApp.Utility
                 using (var client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Accept.Clear();
-                    client.BaseAddress = new Uri(AppSetting.URLGetCustomers);
-                    client.Timeout = TimeSpan.FromMilliseconds(20);
+                    client.BaseAddress = new Uri(_config.Value.URLGetCustomers);
+                    client.Timeout = TimeSpan.FromMilliseconds(200000);
                     //var authData = string.Format("{0}:{1}", AppSetting.MeapUserNamePH, AppSetting.MeapUserPasswordPH);
                     //var authHeaderValue = Convert.ToBase64String(Encoding.UTF8.GetBytes(authData));
                     //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
@@ -43,7 +52,7 @@ namespace DL.WebApp.Utility
             }
         }
 
-        public static async Task<string> CreateCustomer(string request)
+        public async Task<string> CreateCustomer(string request)
         {
             string datafromApi = string.Empty;
             String response;
@@ -52,7 +61,7 @@ namespace DL.WebApp.Utility
                 using (var client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Accept.Clear();
-                    client.BaseAddress = new Uri(AppSetting.UrlCreateCustomer);
+                    client.BaseAddress = new Uri(_config.Value.UrlCreateCustomer);
                     client.Timeout = TimeSpan.FromMilliseconds(20);
                     //var authData = string.Format("{0}:{1}", AppSetting.MeapUserNamePH, AppSetting.MeapUserPasswordPH);
                     //var authHeaderValue = Convert.ToBase64String(Encoding.UTF8.GetBytes(authData));

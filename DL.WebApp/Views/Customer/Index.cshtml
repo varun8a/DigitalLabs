@@ -1,0 +1,25 @@
+﻿@model IEnumerable<DL.Shared.Models.Customer>
+@addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
+@using NonFactors.Mvc.Grid;
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet" />
+</head>
+<body>
+    @(Html.Grid(Model).Build(columns =>
+        {
+            columns.Add(model => model.CustomerSSN).Titled("Customer ID");
+            columns.Add(model => model.FullName).Titled("Customer Name");
+           
+        })
+        )
+</body>
+</html>

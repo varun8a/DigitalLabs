@@ -2,15 +2,17 @@
 using Microsoft.Extensions.Options;
 using DL.Shared.Models;
 using DL.WebApp.Utility;
+using DL.WebApp.Models;
 
 namespace DL.WebApp.Controllers
 {
     public class CustomersController : Controller
     {
+        private readonly IOptionsSnapshot<AppConfig> _config;
 
-        public CustomersController()
+        public CustomersController(IOptionsSnapshot<AppConfig> config)
         {
-
+            _config = config;
         }
 
         public ActionResult Index()
@@ -33,10 +35,10 @@ namespace DL.WebApp.Controllers
         [HttpGet]
         public JsonResult GetAllCustomers(int? page, int? limit, string sortBy, string direction, string searchText, string StopCode, string Description, string LangCode, string Roles, string Process)
         {
-            //CustomerHttpHelper customerHttpHelper = new CustomerHttpHelper();
+            CustomerHttpHelper customerHttpHelper = new CustomerHttpHelper(_config);
             IEnumerable<Customer> query;
             int total;
-            var records = CustomerHttpHelper.GetAllCustomer().Result;
+            var records = customerHttpHelper.GetAllCustomer().Result;
 
             if (!string.IsNullOrWhiteSpace(searchText))
             {

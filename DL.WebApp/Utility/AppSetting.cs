@@ -1,6 +1,6 @@
 ﻿using System.Configuration;
 using System;
-using ConfigurationManager = System.Configuration.ConfigurationManager;
+//using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 namespace DL.WebApp.Utility
 {
@@ -10,7 +10,7 @@ namespace DL.WebApp.Utility
         {
             get
             {
-                return ConfigurationManager.AppSettings["UrlCreateCustomer"];
+                return System.Configuration.ConfigurationManager.AppSettings["UrlCreateCustomer"];
             }
         }
 
@@ -18,7 +18,7 @@ namespace DL.WebApp.Utility
         {
             get
             {
-                return ConfigurationManager.AppSettings["URLGetCustomers"];
+                return System.Configuration.ConfigurationManager.AppSettings["URLGetCustomers"];
             }
         }
 
