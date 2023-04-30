@@ -1,11 +1,12 @@
 ﻿using DL.SyncAPI;
+using DL.SyncAPI.Models;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using DL.DAL.Providers;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using DL.SyncAPI.Models;
+
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -22,11 +23,11 @@ namespace DL.SyncAPI
                    .AddEnvironmentVariables()
                    .Build();
 
-            builder.Services.AddApplicationInsightsTelemetry();
-            builder.Services.Configure<AppConfig>(config.GetSection("AppConfig"));
+            //AppSettings.Register(config, builder.Services, appDirectory);
             DALConfig.Register(config.GetConnectionString("DigitalLabsDB"), builder.Services);
+            //builder.Services.AddHttpClient<IHttpClientHandler, HttpClientHandler>();
             builder.Services.AddOptions();
-
         }
+
     }
 }

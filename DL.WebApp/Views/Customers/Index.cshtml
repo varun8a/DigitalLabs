@@ -78,14 +78,14 @@
 </div>
 
 <script>
-    var dialogAddCustomer ;
+    var dialogAddCustomer, ;
 
 
     function AddNewCustomerView() {
-        dialogAddCustomer.open('Add New Customer');
+        dialogAddStopcode.open('Add New Customer');
     }
 
-    function AddNewCustomer() {
+    function AddNewStopcode() {
         var record = {
             CustomerSSN: $('#CustomerSSNId').val(),
             FullName: $('#FullNameId').val(),
@@ -126,7 +126,7 @@
         grid = $('#gridCustomers').grid({
             guid: '58d47231-ac7b-e6d2-ddba-5e0195c33f2g',
             optimisticPersistence: { localStorage: ["page", "limit"] },
-            //primaryKey: 'Id',
+            primaryKey: 'Id',
             dataSource: '/Customers/GetAllCustomers',
             headerFilter: {
                 type: 'onchange'

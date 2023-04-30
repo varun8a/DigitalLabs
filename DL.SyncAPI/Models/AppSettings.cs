@@ -4,10 +4,22 @@ using System;
 
 namespace DL.SyncAPI.Models
 {
-    public class AppConfig
+    public class AppSettings
     {
-        public string UserName { get; set; }
-        public string Password { get; set; }
+        public static void Register(IConfigurationRoot config, IServiceCollection services, string appDirectory)
+        {
+            try
+            {
+                var appSettings = config.GetSection("AppSettings").Get<AppSettings>();
+                services.AddSingleton(appSettings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+        }
+
     }
 
 

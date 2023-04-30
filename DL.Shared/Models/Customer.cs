@@ -7,5 +7,6 @@
         public decimal LoanAmount { get; set; }
         public decimal EquityAmount { get; set; }
         public decimal SalaryAmount { get; set; }
+
     }
 }
