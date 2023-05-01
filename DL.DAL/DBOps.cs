@@ -7,9 +7,9 @@ namespace DL.DAL
     {
         private readonly IDBProvider _db;
 
+        //Empty for Test Cases
         public DBOps()
         {
-
         }
         public DBOps(IDBProvider dbProvider)
         {

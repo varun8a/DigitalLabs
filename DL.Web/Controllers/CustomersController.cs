@@ -13,6 +13,10 @@ namespace DL.WebApp.Controllers
     {
         public TelemetryClient _telemetry = new TelemetryClient();
 
+        /// <summary>
+        /// Index Page for List
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
             try

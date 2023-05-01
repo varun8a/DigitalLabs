@@ -4,6 +4,7 @@ using System;
 
 namespace DL.SyncAPI.Models
 {
+    //Reading Config from Json
     public class AppConfig
     {
         public string UserName { get; set; }

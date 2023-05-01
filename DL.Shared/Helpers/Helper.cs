@@ -6,6 +6,12 @@ namespace DL.Shared.Helpers
 {
     public static class Helper
     {
+        /// <summary>
+        /// Validate Customer Model
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public static bool ValidateModel(Customer customer)
         {
             if (customer == null)
@@ -23,6 +29,13 @@ namespace DL.Shared.Helpers
             return true;
         }
 
+        /// <summary>
+        /// Validate Basic Auth
+        /// </summary>
+        /// <param name="header"></param>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public static bool ValidateToken(AuthenticationHeaderValue header, string userName, string password)
         {
             //Checking the header

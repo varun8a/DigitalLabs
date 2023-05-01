@@ -8,7 +8,6 @@ namespace DL.DAL.DBHelpers
 
     public class Customers
     {
-
         private readonly IDBProvider _db;
 
         public Customers(IDBProvider dbProvider)// : base(dbProvider)

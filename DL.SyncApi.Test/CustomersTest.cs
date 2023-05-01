@@ -23,9 +23,11 @@ namespace DL.SyncApi.Test
             _dBOps = new Mock<DBOps>(MockBehavior.Strict);
             _telemetry = new TelemetryClient();
         }
-
+        /// <summary>
+        /// Test Valid Request
+        /// </summary>
         [Test]
-        public void Test_Valid_Request()
+        public void Test_IsValid_Request()
         {
             var function = new CustomerLoan(_dBOps.Object, _telemetry, _config);
             var content = new StringContent("", Encoding.UTF8, "application/json");
@@ -40,7 +42,7 @@ namespace DL.SyncApi.Test
         }
 
         [Test]
-        public void Test_Valid_SSN()
+        public void Test_IsValid_SSN()
         {
             var function = new CustomerLoan(_dBOps.Object, _telemetry, _config);
 
@@ -64,7 +66,7 @@ namespace DL.SyncApi.Test
         }
 
         [Test]
-        public void Test_Valid_FullName()
+        public void Test_IsValid_FullName()
         {
             var function = new CustomerLoan(_dBOps.Object, _telemetry, _config);
 
