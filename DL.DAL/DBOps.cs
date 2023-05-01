@@ -7,6 +7,10 @@ namespace DL.DAL
     {
         private readonly IDBProvider _db;
 
+        public DBOps()
+        {
+
+        }
         public DBOps(IDBProvider dbProvider)
         {
             _db = dbProvider;
