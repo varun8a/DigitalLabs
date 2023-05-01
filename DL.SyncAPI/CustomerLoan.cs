@@ -33,6 +33,11 @@ namespace DL.SyncAPI
             _dbOps = dbops;
         }
 
+        /// <summary>
+        /// Add Customer Loan
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
         [FunctionName("AddCustomerLoan")]
         [OpenApiOperation(operationId: nameof(CustomersLoan), tags: new[] { "Customers" }, Visibility = OpenApiVisibilityType.Important)]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "x-functions-key", In = OpenApiSecurityLocationType.Header)]

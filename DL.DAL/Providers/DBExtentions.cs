@@ -13,7 +13,7 @@ namespace DL.DAL.Providers
     }
     public class DBProvider : IDBProvider
     {
-        private string _dbConnectionString;
+        private readonly string _dbConnectionString;
         public DBProvider(string connectionString)
         {
             _dbConnectionString = connectionString;

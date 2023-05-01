@@ -1,5 +1,6 @@
 ﻿namespace DL.Shared.Models
 {
+    //Customer Model
     public class Customer
     {
         public long CustomerSSN { get; set; }
