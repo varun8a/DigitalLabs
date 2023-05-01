@@ -36,6 +36,11 @@ namespace DL.SyncAPI
             _config = config;
         }
 
+        /// <summary>
+        /// Add Customer Loan
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
         [FunctionName("AddCustomerLoan")]
         [OpenApiOperation(operationId: nameof(Customers), tags: new[] { "Customers" }, Visibility = OpenApiVisibilityType.Important)]
         [OpenApiSecurity("basic_auth", SecuritySchemeType.Http, Scheme = OpenApiSecuritySchemeType.Basic)]

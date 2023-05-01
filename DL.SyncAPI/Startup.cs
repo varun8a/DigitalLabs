@@ -22,6 +22,7 @@ namespace DL.SyncAPI
                    .AddEnvironmentVariables()
                    .Build();
 
+
             builder.Services.AddApplicationInsightsTelemetry();
             builder.Services.Configure<AppConfig>(config.GetSection("AppConfig"));
             DALConfig.Register(config.GetConnectionString("DigitalLabsDB"), builder.Services);
