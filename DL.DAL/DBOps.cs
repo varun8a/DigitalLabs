@@ -16,14 +16,14 @@ namespace DL.DAL
             _db = dbProvider;
         }
 
-        private CustomersLoan _customersLoan;
+        private Customers _customersLoan;
 
-        public virtual CustomersLoan CustomersLoan
+        public virtual Customers CustomersLoan
         {
             get
             {
                 if (_customersLoan == null)
-                    _customersLoan = new CustomersLoan(_db);
+                    _customersLoan = new Customers(_db);
                 return _customersLoan;
             }
         }

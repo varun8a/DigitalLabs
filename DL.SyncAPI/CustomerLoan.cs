@@ -1,97 +1,119 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using DL.DAL;
 using DL.DAL.DBHelpers;
+using DL.Shared.Helpers;
 using DL.Shared.Models;
 using DL.SyncAPI.Helpers;
 using DL.SyncAPI.Models;
-using Microsoft.AspNetCore.Http;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 namespace DL.SyncAPI
 {
     public class CustomerLoan
     {
-        private readonly ILogger<CustomerLoan> _logger;
-        private readonly DBOps _dbOps;
-        public CustomerLoan(ILogger<CustomerLoan> log, DBOps dbops)
+        private DBOps _dbOps;
+        private readonly TelemetryClient _telemetry;
+        private readonly AppConfig _config;
+        public CustomerLoan(DBOps dbops, TelemetryClient telemetry, IOptionsSnapshot<AppConfig> config)
         {
-            _logger = log;
             _dbOps = dbops;
+            _telemetry = telemetry;
+            _config = config?.Value ?? null;
         }
-
-        /// <summary>
-        /// Add Customer Loan
-        /// </summary>
-        /// <param name="req"></param>
-        /// <returns></returns>
         [FunctionName("AddCustomerLoan")]
-        [OpenApiOperation(operationId: nameof(CustomersLoan), tags: new[] { "Customers" }, Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "x-functions-key", In = OpenApiSecurityLocationType.Header)]
+        [OpenApiOperation(operationId: nameof(Customers), tags: new[] { "Customers" }, Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiSecurity("basic_auth", SecuritySchemeType.Http, Scheme = OpenApiSecuritySchemeType.Basic)]
         [OpenApiRequestBody(contentType: "application/json", typeof(Customer), Required = true)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
-
-        public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "CustomersLoan")]
-        HttpRequestMessage req,
-        ILogger log)
+        public async Task<IActionResult> AddCustomerLoan(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "CustomersLoan")]
+        HttpRequestMessage req)
         {
-            var response = new ContentResult { ContentType = "application/json", StatusCode = 200 };
-
             try
             {
-                string body = req.Content.ReadAsStringAsync().Result;
-                var result = JsonConvert.DeserializeObject<Customer>(body);
-                CustomerLoanProcessor customerLoanProcessor = new CustomerLoanProcessor(_dbOps);
-                response.Content = await customerLoanProcessor.ProcessCustomerLoanProcessor(result, log);
-
-                return new OkObjectResult(response);
+                if (req != null && req.Headers != null && req.Content != null)
+                {
+                    string body = req.Content.ReadAsStringAsync().Result;
+                    var headers = req.Headers.Authorization;
+                    _telemetry.TrackEvent("Create Customer", new Dictionary<string, string> { { "Request", body } });
+                    var response = new ContentResult { ContentType = "application/json", StatusCode = 200 };
+                    var customer = JsonConvert.DeserializeObject<Customer>(body);
+                    //config null for Test Request Header Exception
+                    if (_config == null || Helper.ValidateToken(headers, _config.UserName, _config.Password))
+                    {
+                        if (Helper.ValidateModel(customer))
+                        {
+                            CustomerLoanProcessor customerLoanProcessor = new CustomerLoanProcessor(_dbOps);
+                            response.Content = await customerLoanProcessor.ProcessCustomerLoanProcessor(customer);
+                            _telemetry.TrackEvent("Create Customer", new Dictionary<string, string> { { "Response", response.Content } });
+                        }
+                        return new OkObjectResult(response);
+                    }
+                    else
+                    {
+                        return new UnauthorizedResult();
+                    }
+                }
+                else
+                {
+                    return new BadRequestObjectResult("Bad Request");
+                }
             }
-            catch (Exception e)
+            catch (ArgumentException ex)
             {
-                log.LogInformation(e.ToString());
+                _telemetry.TrackException(ex, new Dictionary<string, string> { { "Argument Exception in Create", ex.Message } });
+                return new BadRequestObjectResult(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _telemetry.TrackException(ex, new Dictionary<string, string> { { "Exception in Create", ex.Message } });
                 return new BadRequestObjectResult("It went wrong");
             }
         }
-
+        /// <summary>
+        /// GetAllCustomers with Basic Auth
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
         [FunctionName("GetAllCustomersLoan")]
-        [OpenApiOperation(operationId: nameof(CustomersLoan), tags: new[] { "Customers" }, Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "x-functions-key", In = OpenApiSecurityLocationType.Header)]
-        ////[OpenApiRequestBody(contentType: "application/json", typeof(Customers), Required = true)]
+        [OpenApiOperation(operationId: nameof(Customers), tags: new[] { "Customers" }, Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiSecurity("basic_auth", SecuritySchemeType.Http, Scheme = OpenApiSecuritySchemeType.Basic)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(IEnumerable<Customer>))]
-
         public async Task<IEnumerable<Customer>> GetAllCustomersLoan(
-       [HttpTrigger(AuthorizationLevel.Function, "get", Route = "GetAllCustomersLoan")] HttpRequestMessage req,
-       ILogger log)
+       [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetAllCustomersLoan")] HttpRequestMessage req)
         {
             try
             {
-                CustomerLoanProcessor customerLoanProcessor = new(_dbOps);
-                return await customerLoanProcessor.GetAllCustomersLoan(log);
+                _telemetry.TrackEvent("Get All Customers " + _config.UserName, new Dictionary<string, string> { { "User", _config.UserName } });
+                var headers = req.Headers.Authorization;
+                if (_config == null || Helper.ValidateToken(headers, _config.UserName, _config.Password))
+                {
+                    CustomerLoanProcessor customerLoanProcessor = new(_dbOps);
+                    var response = await customerLoanProcessor.GetAllCustomersLoan();
+                    _telemetry.TrackEvent("Get All Customers", new Dictionary<string, string> { { "Response", JsonConvert.SerializeObject(response) } });
+                    return response;
+                }
+                else
+                {
+                    throw new UnauthorizedAccessException();
+                }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                log.LogInformation(e.ToString());
+                _telemetry.TrackException(ex, new Dictionary<string, string> { { "Exception in Get All Customer", ex.Message } });
                 throw;
             }
         }
     }
-
-
-
 }
-
-
